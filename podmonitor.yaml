@@ -1,18 +1,6 @@
 # This is a simple example.
 # It looks for pods in the default namespace with a label 'prometheus' set to 'application-monitoring'
 # They will be scraped for prometheus metrics
-#
-# apiVersion: monitoring.coreos.com/v1
-# kind: PodMonitor
-# metadata:
-#   name: prometheus
-# spec:
-#   selector:
-#     matchLabels:
-#       prometheus: application-monitoring
-#   namespaceSelector:
-#     matchNames:
-#       - "default"
 
 apiVersion: monitoring.coreos.com/v1
 kind: PodMonitor
