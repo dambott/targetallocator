@@ -1,0 +1,103 @@
+---
+### Prometheus-client1 Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prometheus-client1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: prometheus-client1
+  template:
+    metadata:
+      labels:
+        app: prometheus-client1
+      annotations:
+        prometheus.io/scrape: "true"
+    spec:
+      containers:
+      - name: prometheus-client1
+        image: public.ecr.aws/w3s4j9x9/microservices-demo:python
+        ports:
+        - name: http
+          containerPort: 9090
+        imagePullPolicy: Always
+        workingDir: /home/code
+        env:
+        - name: GAUGE_NAME
+          value: prom1
+        command: ["/bin/sh"]
+        args: ["start-prometheus.sh"]
+        readinessProbe:
+          httpGet:
+            path: /metrics
+            port: 8080
+        livenessProbe:
+          httpGet:
+            path: /metrics
+            port: 8080
+        resources:
+          limits:
+            cpu: "500m"
+            memory: "256Mi"
+          requests:
+            cpu: "250m"
+            memory: "128Mi"
+
+---
+### Prometheus-client1 Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: prometheus-client1
+  labels:
+    prometheus: application-monitoring  
+spec:
+  selector:
+    app: prometheus-client1
+  ports:
+  - protocol: TCP
+    port: 9090
+    targetPort: 9090
+
+---
+### Prometheus-client2 Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prometheus-client2
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: prometheus-client2
+  template:
+    metadata:
+      labels:
+        app: prometheus-client2
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9090"
+    spec:
+      containers:
+      - name: prometheus-client2
+        image: public.ecr.aws/w3s4j9x9/microservices-demo:python
+        ports:
+        - name: http
+          containerPort: 9090
+        imagePullPolicy: Always
+        workingDir: /home/code
+        env:
+        - name: GAUGE_NAME
+          value: prom2
+        command: ["/bin/sh"]
+        args: ["start-prometheus.sh"]
+        resources:
+          limits:
+            cpu: "500m"
+            memory: "256Mi"
+          requests:
+            cpu: "250m"
+            memory: "128Mi"
